@@ -10,6 +10,17 @@ function App() {
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
+	FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
         <a
           className="App-link"
           href="https://reactjs.org"
