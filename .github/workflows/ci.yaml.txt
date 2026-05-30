@@ -2,27 +2,23 @@ name: Docker CI/CD
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Build Docker image
         run: docker build -t my-react-app .
-
       - name: Test inside container
         run: docker run --rm my-react-app npm test --if-present || true
-
       - name: Extract build artifact
         run: |
           docker create --name temp-container my-react-app
           docker cp temp-container:/usr/share/nginx/html ./build-output
           docker rm temp-container
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: react-build
           path: ./build-output
-
